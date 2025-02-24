@@ -17,7 +17,7 @@ export function getPublishedQuestions(questions: Question[]): Question[] {
  * `expected`, and an empty array for its `options`.
  */
 export function getNonEmptyQuestions(questions: Question[]): Question[] {
-    const nonEmptyQuestions = questions.filter((question: Question): boolean => question.body.length > 0 && question.expected.length > 0 && question.options.length > 0);
+    const nonEmptyQuestions = questions.filter((question: Question): boolean => question.body !== ""  || question.expected !== "" || question.options.length > 0);
     return nonEmptyQuestions;
 }
 
@@ -55,7 +55,7 @@ export function getNames(questions: Question[]): string[] {
  * Consumes an array of questions and returns the sum total of all their points added together.
  */
 export function sumPoints(questions: Question[]): number {
-    const totalPoints = questions.reduce((sum: number, question: Question) => sum + question.points, 0);
+    const totalPoints = questions.reduce((sum: number, question: Question): number => sum + question.points, 0);
     return totalPoints;
 }
 
@@ -64,7 +64,8 @@ export function sumPoints(questions: Question[]): number {
  */
 export function sumPublishedPoints(questions: Question[]): number {
     const publishedQuestions = questions.filter((question: Question): boolean => question.published);
-    return publishedQuestions.length;
+    const totalPoints = publishedQuestions.reduce((sum: number, question: Question): number => sum + question.points, 0);
+    return totalPoints;
 }
 
 /***
@@ -119,8 +120,11 @@ export function publishAll(questions: Question[]): Question[] {
  * are the same type. They can be any type, as long as they are all the SAME type.
  */
 export function sameType(questions: Question[]): boolean {
-    const type = questions[0].type;
-    return questions.every((question: Question): boolean => question.type === type);
+    if (questions.length === 0) {
+        return true;
+    }
+    const targetType = questions[0].type;
+    return questions.every((question: Question): boolean => question.type === targetType);
 }
 
 /***
@@ -228,7 +232,7 @@ export function duplicateQuestionInArray(
     questions.forEach((question: Question) => {
         newQuestions.push(question);
         if (question.id === targetId) {
-            const duplicateQuestion: Question = {...question, id: newId};
+            const duplicateQuestion: Question = {...question, id: newId, name: `Copy of ${question.name}`};
             newQuestions.push(duplicateQuestion);
         }
     });
