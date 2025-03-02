@@ -204,10 +204,8 @@ export function editOption(
 ): Question[] {
     const newOptions = questions.map((question: Question): Question => {
         if (question.id === targetId) {
-            const updatedOptions = [...question.options];
-            if (targetOptionIndex === -1) {
-                updatedOptions.push(newOption);
-            } else {
+            const updatedOptions = targetOptionIndex === -1 ? [...question.options, newOption] : [...question.options];
+            if (targetOptionIndex !== -1) {
                 updatedOptions[targetOptionIndex] = newOption;
             }
             return {...question, options: updatedOptions};
@@ -228,13 +226,11 @@ export function duplicateQuestionInArray(
     targetId: number,
     newId: number
 ): Question[] {
-    const newQuestions: Question[] = [];
-    questions.forEach((question: Question) => {
-        newQuestions.push(question);
+    const findTarget = questions.reduce((newQuestions: Question[], question: Question) => {newQuestions = [...newQuestions, question];
         if (question.id === targetId) {
-            const duplicateQuestion: Question = {...question, id: newId, name: `Copy of ${question.name}`};
-            newQuestions.push(duplicateQuestion);
+            newQuestions = [...newQuestions, { ...question, id: newId, name: `Copy of ${question.name}`}];
         }
-    });
-    return newQuestions;
+        return newQuestions;
+    }, []);
+    return findTarget;
 }
